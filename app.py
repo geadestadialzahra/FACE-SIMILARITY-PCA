@@ -1,4 +1,4 @@
-# app.py - VERSI FINAL (BACKGROUND UPLOADER PINK)
+# app.py - VERSI FINAL (PAKSA TEMA LIGHT)
 # =====================================================
 
 import streamlit as st
@@ -11,106 +11,104 @@ import cv2
 import time
 
 # ==========================================
-# 1. PENGATURAN HALAMAN & CSS
+# 1. PENGATURAN HALAMAN
 # ==========================================
 st.set_page_config(
     page_title="PCA Face Similarity",
     page_icon="🌸",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
+# ==========================================
+# 2. CSS SUPER KUAT (PAKSA LIGHT MODE)
+# ==========================================
 st.markdown("""
     <style>
-        /* ===== BACKGROUND UTAMA ===== */
-        .stApp {
-            background: linear-gradient(135deg, #FFF0F5, #FFE4E9, #FCE4EC) !important;
-        }
-        .main > div {
-            background: transparent !important;
+        /* ===== FORCE LIGHT MODE PADA SEMUA ELEMEN ===== */
+        .stApp, .main, .block-container, section.main, div[data-testid="stSidebar"] {
+            background-color: #FFF0F5 !important;
+            background-image: none !important;
         }
         
-        /* ===== HEADER / TOP BAR (PINK GELAP) ===== */
+        /* ===== SEMUA TEKS JADI PINK GELAP ===== */
+        body, p, div, span, label, h1, h2, h3, h4, h5, h6 {
+            color: #6A1B4D !important;
+        }
+        
+        /* ===== HEADER (BAR ATAS) ===== */
         header {
-            background: linear-gradient(135deg, #880E4F, #AD1457, #880E4F) !important;
+            background: linear-gradient(135deg, #880E4F, #AD1457) !important;
             border-bottom: 2px solid #F8BBD0 !important;
-            box-shadow: 0 2px 15px rgba(136, 14, 79, 0.3) !important;
         }
         
-        /* ===== SIDEBAR (PINK SOFT) ===== */
+        /* ===== SIDEBAR ===== */
         .css-1d391kg, .css-12w0qpk, [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #FCE4EC 0%, #FFF0F5 100%) !important;
+            background: linear-gradient(180deg, #FCE4EC, #FFF0F5) !important;
             border-right: 2px solid #F8BBD0 !important;
         }
         
-        /* ===== JUDUL UTAMA ===== */
+        /* ===== JUDUL ===== */
         .main-title {
-            text-align: center;
             color: #AD1457 !important;
             font-size: 42px !important;
             font-weight: bold !important;
             text-shadow: 0 2px 15px rgba(173, 20, 87, 0.2) !important;
         }
         .sub-title {
-            text-align: center;
             color: #D81B60 !important;
             font-size: 18px !important;
-            text-shadow: 0 1px 10px rgba(216, 27, 96, 0.15) !important;
         }
         
-        /* ===== SEMUA HEADING JADI PINK ===== */
-        h1, h2, h3, h4, h5, h6 {
-            color: #AD1457 !important;
-        }
-        
-        /* ===== JUDUL "Upload Dua Wajah untuk Dibandingkan" ===== */
-        .stMarkdown h2, .stMarkdown h3, .stHeader {
-            color: #AD1457 !important;
-            font-weight: bold !important;
-        }
-        
-        /* ===== TULISAN "Foto Pertama" & "Foto Kedua" ===== */
-        .stMarkdown h4, .stSubheader {
+        /* ===== SEMUA HEADING ===== */
+        h1, h2, h3, h4, h5, h6, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4 {
             color: #AD1457 !important;
             font-weight: bold !important;
         }
         
         /* =========================================================
-           ===== FILE UPLOADER (BACKGROUND + BORDER + TEKS) =====
+           ===== FILE UPLOADER (PAKSA LIGHT) =====
            ========================================================= */
         
-        /* Container utama file uploader */
-        .stFileUploader {
+        /* Container utama */
+        div[data-testid="stFileUploader"] {
             background: linear-gradient(135deg, #FCE4EC, #FFF0F5) !important;
-            border-radius: 12px !important;
             border: 2px dashed #EC407A !important;
+            border-radius: 12px !important;
             padding: 10px !important;
+            box-shadow: none !important;
         }
         
-        /* Background area drop zone */
-        .stFileUploader > div {
-            background: rgba(255, 255, 255, 0.4) !important;
+        /* Area drop zone */
+        div[data-testid="stFileUploader"] > div {
+            background: rgba(255, 255, 255, 0.6) !important;
             border-radius: 8px !important;
-            padding: 15px !important;
+            padding: 20px !important;
         }
         
-        /* Teks di dalam file uploader */
-        .stFileUploader label, .stFileUploader div, .stFileUploader span, .stFileUploader p {
+        /* Semua teks di dalam uploader */
+        div[data-testid="stFileUploader"] label,
+        div[data-testid="stFileUploader"] p,
+        div[data-testid="stFileUploader"] span,
+        div[data-testid="stFileUploader"] div {
             color: #6A1B4D !important;
+            background: transparent !important;
         }
         
         /* Tulisan "Upload" besar */
-        .stFileUploader .st-emotion-cache-1v0mbdj, .stFileUploader .st-bb {
+        div[data-testid="stFileUploader"] .st-emotion-cache-1v0mbdj {
             color: #6A1B4D !important;
             font-weight: bold !important;
+            font-size: 18px !important;
         }
         
-        /* Tulisan "200MB per file · JPG, PNG" */
-        .stFileUploader .st-emotion-cache-1r6slb0, .stFileUploader .st-at {
+        /* Tulisan "200MB per file..." */
+        div[data-testid="stFileUploader"] .st-emotion-cache-1r6slb0 {
             color: #8B4A6D !important;
         }
         
-        /* Tombol "Browse files" di file uploader */
-        .stFileUploader button {
+        /* Tombol "Browse files" */
+        div[data-testid="stFileUploader"] button {
             background: linear-gradient(135deg, #EC407A, #D81B60) !important;
             color: white !important;
             border-radius: 20px !important;
@@ -118,18 +116,18 @@ st.markdown("""
             padding: 5px 20px !important;
             transition: 0.3s !important;
         }
-        .stFileUploader button:hover {
+        div[data-testid="stFileUploader"] button:hover {
             transform: scale(1.05) !important;
             box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3) !important;
         }
         
-        /* Hover effect pada area upload */
-        .stFileUploader:hover {
+        /* Hover pada area upload */
+        div[data-testid="stFileUploader"]:hover {
             border-color: #D81B60 !important;
             background: linear-gradient(135deg, #F8BBD0, #FCE4EC) !important;
         }
-        .stFileUploader:hover > div {
-            background: rgba(255, 255, 255, 0.6) !important;
+        div[data-testid="stFileUploader"]:hover > div {
+            background: rgba(255, 255, 255, 0.8) !important;
         }
         
         /* ===== TOMBOL SAKURA DI SIDEBAR ===== */
@@ -201,13 +199,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. SESSION STATE
+# 3. SESSION STATE
 # ==========================================
 if "show_upload" not in st.session_state:
     st.session_state.show_upload = True
 
 # ==========================================
-# 3. FUNGSI DETEKSI WAJAH
+# 4. FUNGSI DETEKSI WAJAH
 # ==========================================
 def detect_and_crop_face(image_bytes):
     np_arr = np.frombuffer(image_bytes, np.uint8)
@@ -229,13 +227,13 @@ def preprocess_with_face_detection(file_bytes, img_size=(100, 100)):
     return normalized.flatten(), resized, detected
 
 # ==========================================
-# 4. JUDUL
+# 5. JUDUL
 # ==========================================
 st.markdown('<p class="main-title">🌸 Deteksi Kemiripan Wajah</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Menggunakan PCA (Eigenfaces) & Cosine Similarity</p>', unsafe_allow_html=True)
 
 # ==========================================
-# 5. SIDEBAR
+# 6. SIDEBAR
 # ==========================================
 with st.sidebar:
     st.markdown("---")
@@ -283,7 +281,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # ==========================================
-# 6. AREA UTAMA: UPLOAD 2 FOTO UJI
+# 7. AREA UTAMA: UPLOAD 2 FOTO UJI
 # ==========================================
 st.markdown("## 🔍 Upload Dua Wajah untuk Dibandingkan")
 
@@ -298,7 +296,7 @@ with col2:
     face2_file = st.file_uploader("Upload Foto 2", type=["jpg","jpeg","png"], key="f2", label_visibility="collapsed")
 
 # ==========================================
-# 7. TOMBOL PROSES
+# 8. TOMBOL PROSES
 # ==========================================
 if st.button("🚀 Proses Deteksi Sekarang", use_container_width=True):
     if 'uploaded_train_files' not in locals() or not uploaded_train_files or len(uploaded_train_files) < 10:
