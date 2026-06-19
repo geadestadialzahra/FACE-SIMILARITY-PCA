@@ -1,4 +1,4 @@
-# app.py - VERSI FINAL (HASIL DETEKSI DIPERBAIKI)
+# app.py - VERSI FINAL (TEMA PINK TOTAL, TAHAN DARK MODE)
 # =====================================================
 
 import streamlit as st
@@ -19,39 +19,42 @@ st.set_page_config(
     layout="wide"
 )
 
+# ==========================================
+# 2. CSS SUPER KUAT (PAKSA PINK, TAHAN DARK MODE)
+# ==========================================
 st.markdown("""
     <style>
-        /* ===== BACKGROUND UTAMA ===== */
-        .stApp {
-            background: linear-gradient(135deg, #FFF0F5, #FFE4E9, #FCE4EC) !important;
-        }
-        .main > div {
-            background: transparent !important;
+        /* ===== FORCE LIGHT MODE + PINK ===== */
+        .stApp, .main, .block-container, section.main, div[data-testid="stSidebar"] {
+            background-color: #FFF0F5 !important;
+            background-image: none !important;
         }
         
-        /* ===== HEADER / TOP BAR ===== */
+        /* ===== SEMUA TEKS ===== */
+        body, p, div, span, label, h1, h2, h3, h4, h5, h6, .stMarkdown, .stText, .stCaption {
+            color: #6A1B4D !important;
+        }
+        
+        /* ===== HEADER (BAR ATAS) ===== */
         header {
-            background: linear-gradient(135deg, #880E4F, #AD1457, #880E4F) !important;
+            background: linear-gradient(135deg, #880E4F, #AD1457) !important;
             border-bottom: 2px solid #F8BBD0 !important;
-            box-shadow: 0 2px 15px rgba(136, 14, 79, 0.3) !important;
         }
         
         /* ===== SIDEBAR ===== */
         .css-1d391kg, .css-12w0qpk, [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #FCE4EC 0%, #FFF0F5 100%) !important;
+            background: linear-gradient(180deg, #FCE4EC, #FFF0F5) !important;
             border-right: 2px solid #F8BBD0 !important;
         }
         
         /* ===== JUDUL ===== */
         .main-title {
-            text-align: center;
             color: #AD1457 !important;
             font-size: 42px !important;
             font-weight: bold !important;
             text-shadow: 0 2px 15px rgba(173, 20, 87, 0.2) !important;
         }
         .sub-title {
-            text-align: center;
             color: #D81B60 !important;
             font-size: 18px !important;
             text-shadow: 0 1px 10px rgba(216, 27, 96, 0.15) !important;
@@ -63,25 +66,46 @@ st.markdown("""
             font-weight: bold !important;
         }
         
-        /* ===== TULISAN HASIL (TIDAK MIRIP / MIRIP) ===== */
-        .stAlert, .stSuccess, .stError, .stWarning {
-            background-color: transparent !important;
-            border: none !important;
-        }
-        .stAlert p, .stSuccess p, .stError p, .stWarning p {
-            color: #6A1B4D !important;
-            font-weight: bold !important;
-            font-size: 20px !important;
-        }
-        
-        /* ===== METRIC ===== */
-        .stMetric {
-            background: rgba(255, 255, 255, 0.3) !important;
+        /* =========================================================
+           ===== FILE UPLOADER (PAKSA PINK) =====
+           ========================================================= */
+        div[data-testid="stFileUploader"],
+        .stFileUploader,
+        .st-emotion-cache-1v0mbdj,
+        .st-emotion-cache-1r6slb0,
+        .st-emotion-cache-1wmy9hl {
+            background: linear-gradient(135deg, #FCE4EC, #FFF0F5) !important;
+            border: 2px dashed #EC407A !important;
             border-radius: 12px !important;
             padding: 10px !important;
         }
-        .stMetric label, .stMetric div, .stMetric span {
+        div[data-testid="stFileUploader"] > div,
+        .stFileUploader > div {
+            background: rgba(255, 255, 255, 0.6) !important;
+            border-radius: 8px !important;
+            padding: 20px !important;
+        }
+        div[data-testid="stFileUploader"] *,
+        .stFileUploader * {
             color: #6A1B4D !important;
+            background: transparent !important;
+        }
+        div[data-testid="stFileUploader"] button,
+        .stFileUploader button {
+            background: linear-gradient(135deg, #EC407A, #D81B60) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 20px !important;
+            padding: 5px 20px !important;
+        }
+        div[data-testid="stFileUploader"] button:hover,
+        .stFileUploader button:hover {
+            transform: scale(1.05) !important;
+        }
+        div[data-testid="stFileUploader"]:hover,
+        .stFileUploader:hover {
+            border-color: #D81B60 !important;
+            background: linear-gradient(135deg, #F8BBD0, #FCE4EC) !important;
         }
         
         /* ===== TOMBOL SAKURA DI SIDEBAR ===== */
@@ -91,7 +115,6 @@ st.markdown("""
             border-radius: 50% !important;
             font-size: 32px !important;
             padding: 8px 14px !important;
-            transition: 0.3s !important;
             color: #EC407A !important;
             width: 55px !important;
             height: 55px !important;
@@ -103,7 +126,6 @@ st.markdown("""
         .sakura-btn-container .stButton button:hover {
             transform: scale(1.1) rotate(15deg) !important;
             background: rgba(236, 64, 122, 0.2) !important;
-            box-shadow: 0 0 20px rgba(236, 64, 122, 0.3) !important;
         }
         
         /* ===== TOMBOL PROSES ===== */
@@ -115,11 +137,9 @@ st.markdown("""
             padding: 10px 30px !important;
             border: none !important;
             box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3) !important;
-            transition: 0.3s !important;
         }
         .stButton button:hover {
             transform: scale(1.03) translateY(-2px) !important;
-            box-shadow: 0 8px 25px rgba(233, 30, 99, 0.4) !important;
         }
         
         /* ===== CARD HASIL ===== */
@@ -132,68 +152,44 @@ st.markdown("""
             box-shadow: 0 4px 15px rgba(233, 30, 99, 0.1) !important;
         }
         
+        /* ===== METRIC HASIL ===== */
+        .stMetric {
+            background: rgba(255, 255, 255, 0.3) !important;
+            border-radius: 12px !important;
+            padding: 10px !important;
+        }
+        .stMetric label, .stMetric div, .stMetric span {
+            color: #6A1B4D !important;
+        }
+        
         /* ===== SLIDER ===== */
         .stSlider > div {
             background: rgba(255, 255, 255, 0.4) !important;
             border-radius: 10px !important;
         }
         
-        /* ===== FILE UPLOADER ===== */
-        .stFileUploader {
-            background: linear-gradient(135deg, #FCE4EC, #FFF0F5) !important;
-            border: 2px dashed #EC407A !important;
-            border-radius: 12px !important;
-            padding: 10px !important;
-        }
-        .stFileUploader > div {
-            background: rgba(255, 255, 255, 0.5) !important;
-            border-radius: 8px !important;
-            padding: 15px !important;
-        }
-        .stFileUploader label, .stFileUploader div, .stFileUploader span, .stFileUploader p {
+        /* ===== SUCCESS / ERROR ===== */
+        .stAlert p, .stSuccess p, .stError p, .stWarning p {
             color: #6A1B4D !important;
-        }
-        .stFileUploader button {
-            background: linear-gradient(135deg, #EC407A, #D81B60) !important;
-            color: white !important;
-            border-radius: 20px !important;
-            border: none !important;
-            padding: 5px 20px !important;
-        }
-        .stFileUploader button:hover {
-            transform: scale(1.05) !important;
-            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3) !important;
-        }
-        .stFileUploader:hover {
-            border-color: #D81B60 !important;
-            background: linear-gradient(135deg, #F8BBD0, #FCE4EC) !important;
-        }
-        .stFileUploader:hover > div {
-            background: rgba(255, 255, 255, 0.7) !important;
+            font-weight: bold !important;
+            font-size: 20px !important;
         }
         
-        /* ===== FOTO HASIL ===== */
-        .result-image {
-            border-radius: 12px !important;
-            border: 2px solid #F8BBD0 !important;
-            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.15) !important;
-        }
-        
-        /* ===== SEMUA TEKS JADI PINK ===== */
-        body, p, div, span, label, .stMarkdown {
-            color: #6A1B4D !important;
+        /* ===== GRAFIK ===== */
+        .stPlotlyChart, .stMatplotlib {
+            background: transparent !important;
         }
     </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. SESSION STATE
+# 3. SESSION STATE
 # ==========================================
 if "show_upload" not in st.session_state:
     st.session_state.show_upload = True
 
 # ==========================================
-# 3. FUNGSI DETEKSI WAJAH
+# 4. FUNGSI DETEKSI WAJAH & PREPROCESSING
 # ==========================================
 def detect_and_crop_face(image_bytes):
     np_arr = np.frombuffer(image_bytes, np.uint8)
@@ -205,29 +201,23 @@ def detect_and_crop_face(image_bytes):
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(50, 50))
     if len(faces) > 0:
         x, y, w, h = max(faces, key=lambda rect: rect[2] * rect[3])
-        face_crop = gray[y:y+h, x:x+w]
-        return face_crop, True
+        return gray[y:y+h, x:x+w], True
     return gray, False
 
 def preprocess_with_face_detection(file_bytes, img_size=(100, 100)):
     face_crop, detected = detect_and_crop_face(file_bytes)
-    resized_gray = cv2.resize(face_crop, img_size)
-    normalized = resized_gray / 255.0
-    vector = normalized.flatten()
-    return vector, resized_gray, detected
+    resized = cv2.resize(face_crop, img_size)
+    normalized = resized / 255.0
+    return normalized.flatten(), resized, detected
 
 def load_color_image(file_bytes, img_size=(100, 100)):
-    """Load gambar berwarna untuk ditampilkan di hasil"""
     np_arr = np.frombuffer(file_bytes, np.uint8)
     img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-    
-    # Deteksi dan crop wajah (biar konsisten dengan preprocessing)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     face_cascade = cv2.CascadeClassifier(
         cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
     )
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(50, 50))
-    
     if len(faces) > 0:
         x, y, w, h = max(faces, key=lambda rect: rect[2] * rect[3])
         face_crop = img[y:y+h, x:x+w]
@@ -238,13 +228,13 @@ def load_color_image(file_bytes, img_size=(100, 100)):
         return cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
 
 # ==========================================
-# 4. JUDUL
+# 5. JUDUL
 # ==========================================
 st.markdown('<p class="main-title">🌸 Deteksi Kemiripan Wajah</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Menggunakan PCA (Eigenfaces) & Cosine Similarity</p>', unsafe_allow_html=True)
 
 # ==========================================
-# 5. SIDEBAR
+# 6. SIDEBAR
 # ==========================================
 with st.sidebar:
     st.markdown("---")
@@ -292,7 +282,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # ==========================================
-# 6. AREA UTAMA: UPLOAD 2 FOTO UJI
+# 7. AREA UTAMA: UPLOAD 2 FOTO UJI
 # ==========================================
 st.markdown("## 🔍 Upload Dua Wajah untuk Dibandingkan")
 
@@ -307,7 +297,7 @@ with col2:
     face2_file = st.file_uploader("Upload Foto 2", type=["jpg","jpeg","png"], key="f2", label_visibility="collapsed")
 
 # ==========================================
-# 7. TOMBOL PROSES
+# 8. TOMBOL PROSES & LOGIKA
 # ==========================================
 if st.button("🚀 Proses Deteksi Sekarang", use_container_width=True):
     if 'uploaded_train_files' not in locals() or not uploaded_train_files or len(uploaded_train_files) < 10:
@@ -332,11 +322,9 @@ if st.button("🚀 Proses Deteksi Sekarang", use_container_width=True):
             pca = PCA(n_components=k)
             X_pca = pca.fit_transform(X_train)
             
-            # Proses foto uji (grayscale untuk PCA)
             vec1, _, _ = preprocess_with_face_detection(face1_file.getvalue(), IMG_SIZE)
             vec2, _, _ = preprocess_with_face_detection(face2_file.getvalue(), IMG_SIZE)
             
-            # Load foto warna untuk ditampilkan
             img1_color = load_color_image(face1_file.getvalue(), IMG_SIZE)
             img2_color = load_color_image(face2_file.getvalue(), IMG_SIZE)
             
@@ -347,24 +335,23 @@ if st.button("🚀 Proses Deteksi Sekarang", use_container_width=True):
             progress_bar.empty()
             
             # ==========================================
-            # 8. TAMPILKAN HASIL (DIPERBAIKI)
+            # 9. TAMPILKAN HASIL
             # ==========================================
             st.markdown("---")
             st.subheader("📊 Hasil Deteksi")
             
-            # Layout 3 kolom: Foto1 | Foto2 | Skor
             col_r1, col_r2, col_r3 = st.columns([2, 2, 1.5])
             
             with col_r1:
                 st.markdown('<div class="result-card">', unsafe_allow_html=True)
                 st.markdown("**📸 Foto Pertama**")
-                st.image(img1_color, caption=f"Ukuran: {IMG_SIZE[0]}x{IMG_SIZE[1]}", use_container_width=True)
+                st.image(img1_color, caption=f"Resize {IMG_SIZE[0]}x{IMG_SIZE[1]}", use_container_width=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             
             with col_r2:
                 st.markdown('<div class="result-card">', unsafe_allow_html=True)
                 st.markdown("**📸 Foto Kedua**")
-                st.image(img2_color, caption=f"Ukuran: {IMG_SIZE[0]}x{IMG_SIZE[1]}", use_container_width=True)
+                st.image(img2_color, caption=f"Resize {IMG_SIZE[0]}x{IMG_SIZE[1]}", use_container_width=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             
             with col_r3:
@@ -384,7 +371,7 @@ if st.button("🚀 Proses Deteksi Sekarang", use_container_width=True):
                 st.markdown('</div>', unsafe_allow_html=True)
             
             # ==========================================
-            # 9. GRAFIK AKUMULASI INFORMASI
+            # 10. GRAFIK
             # ==========================================
             st.subheader("📈 Grafik Akumulasi Informasi")
             explained_variance = np.cumsum(pca.explained_variance_ratio_)
