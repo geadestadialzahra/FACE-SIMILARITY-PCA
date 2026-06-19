@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.metrics.pairwise import cosine_similarity
 import time
+import base64
+from io import BytesIO
 
 # ==========================================
 # IMPOR SKIMAGE (jika ada) untuk SSIM & PSNR
@@ -22,6 +24,17 @@ try:
     SKIMAGE_AVAILABLE = True
 except ImportError:
     SKIMAGE_AVAILABLE = False
+
+# ==========================================
+# FUNGSI HELPERS
+# ==========================================
+def image_to_base64(img_array):
+    """Mengubah array numpy (RGB) menjadi base64 data URL."""
+    img_pil = Image.fromarray(img_array)
+    buffered = BytesIO()
+    img_pil.save(buffered, format="PNG")
+    img_str = base64.b64encode(buffered.getvalue()).decode()
+    return f"data:image/png;base64,{img_str}"
 
 # ==========================================
 # 1. PENGATURAN HALAMAN
@@ -452,33 +465,118 @@ def halaman_deteksi():
                 proj2 = pca.transform([v2])
                 kemiripan = cosine_similarity(proj1, proj2)[0][0]
                 progress.empty()
+
+                # --- TAMPILAN HASIL YANG DIPERBAIKI ---
+                # Konversi ke base64
+                img1_base64 = image_to_base64(img1_warna)
+                img2_base64 = image_to_base64(img2_warna)
+
                 st.markdown("---")
                 st.subheader("📊 Hasil Deteksi")
+
                 col_r1, col_r2, col_r3 = st.columns([2, 2, 1.5])
+
                 with col_r1:
-                    st.markdown('<div class="result-card">', unsafe_allow_html=True)
-                    st.markdown('<span class="pink-badge">📸 Foto Pertama</span>', unsafe_allow_html=True)
-                    st.image(img1_warna, caption=f"Resize {UKURAN[0]}x{UKURAN[1]}", use_container_width=True)
-                    st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown(f"""
+                    <div style="
+                        background-image: url('{img1_base64}');
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        aspect-ratio: 1 / 1;
+                        width: 100%;
+                        position: relative;
+                        border-radius: 15px;
+                        border: 1px solid #F8BBD0;
+                        box-shadow: 0 4px 15px rgba(233,30,99,0.1);
+                    ">
+                        <span style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            background: rgba(255,255,255,0.85);
+                            padding: 8px 18px;
+                            border-radius: 20px;
+                            font-weight: bold;
+                            color: #AD1457;
+                            border: 1px solid #EC407A;
+                            box-shadow: 0 2px 8px rgba(233,30,99,0.12);
+                        ">
+                            📸 Foto Pertama
+                        </span>
+                    </div>
+                    """, unsafe_allow_html=True)
+
                 with col_r2:
-                    st.markdown('<div class="result-card">', unsafe_allow_html=True)
-                    st.markdown('<span class="pink-badge">📸 Foto Kedua</span>', unsafe_allow_html=True)
-                    st.image(img2_warna, caption=f"Resize {UKURAN[0]}x{UKURAN[1]}", use_container_width=True)
-                    st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown(f"""
+                    <div style="
+                        background-image: url('{img2_base64}');
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        aspect-ratio: 1 / 1;
+                        width: 100%;
+                        position: relative;
+                        border-radius: 15px;
+                        border: 1px solid #F8BBD0;
+                        box-shadow: 0 4px 15px rgba(233,30,99,0.1);
+                    ">
+                        <span style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            background: rgba(255,255,255,0.85);
+                            padding: 8px 18px;
+                            border-radius: 20px;
+                            font-weight: bold;
+                            color: #AD1457;
+                            border: 1px solid #EC407A;
+                            box-shadow: 0 2px 8px rgba(233,30,99,0.12);
+                        ">
+                            📸 Foto Kedua
+                        </span>
+                    </div>
+                    """, unsafe_allow_html=True)
+
                 with col_r3:
-                    st.markdown('<div class="result-card">', unsafe_allow_html=True)
-                    st.markdown('<span class="pink-badge">🎯 Skor Kemiripan</span>', unsafe_allow_html=True)
-                    st.markdown(f"<h1 style='color:#AD1457;font-size:42px;'>{kemiripan:.2%}</h1>", unsafe_allow_html=True)
-                    if kemiripan >= ambang:
-                        st.success("✅ **MIRIP**")
-                        st.balloons()
-                    elif kemiripan >= 0.50:
-                        st.warning("⚠️ **CUKUP MIRIP**")
-                    else:
-                        st.error("❌ **TIDAK MIRIP**")
-                    st.caption(f"Komponen PCA: {k}")
-                    st.caption(f"Varians: {np.sum(pca.explained_variance_ratio_)*100:.1f}%")
-                    st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown(f"""
+                    <div style="
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100%;
+                        border-radius: 15px;
+                        border: 1px solid #F8BBD0;
+                        box-shadow: 0 4px 15px rgba(233,30,99,0.1);
+                        background: linear-gradient(135deg, #FCE4EC, #FFF0F5);
+                        padding: 20px;
+                    ">
+                        <span style="
+                            background: linear-gradient(135deg, #FCE4EC, #F8BBD0);
+                            color: #AD1457;
+                            padding: 6px 18px;
+                            border-radius: 20px;
+                            font-weight: bold;
+                            font-size: 14px;
+                            border: 1px solid #EC407A;
+                            box-shadow: 0 2px 8px rgba(233,30,99,0.12);
+                            margin-bottom: 10px;
+                        ">
+                            🎯 Skor Kemiripan
+                        </span>
+                        <h1 style="color:#AD1457;font-size:42px; margin:0;">{kemiripan:.2%}</h1>
+                        <div style="margin-top: 6px; font-weight: bold; color: {'green' if kemiripan >= ambang else 'red'};">
+                            {'✅ MIRIP' if kemiripan >= ambang else '❌ TIDAK MIRIP'}
+                        </div>
+                        <div style="margin-top: 10px; font-size: 14px; color: #6A1B4D;">Komponen PCA: {k}</div>
+                        <div style="font-size: 14px; color: #6A1B4D;">Varians: {np.sum(pca.explained_variance_ratio_)*100:.1f}%</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                # Grafik tetap di bawah
                 st.subheader("📈 Grafik Akumulasi Informasi")
                 varians = np.cumsum(pca.explained_variance_ratio_)
                 fig, ax = plt.subplots(figsize=(8, 4))
