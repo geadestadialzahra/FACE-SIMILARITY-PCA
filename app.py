@@ -46,12 +46,14 @@ st.markdown("""
             color: #FFFFFF !important;
             fill: #FFFFFF !important;
         }
+        
+        /* Tombol Share, menu, dll di header */
         header button, header svg, header span, header div {
             color: #FFFFFF !important;
             fill: #FFFFFF !important;
         }
         
-        /* Tombol Share, menu, dll di header */
+        /* Ikon di header */
         header .st-emotion-cache-1v0mbdj, header .st-emotion-cache-1r6slb0 {
             color: #FFFFFF !important;
         }
@@ -104,15 +106,11 @@ st.markdown("""
             border-radius: 8px !important;
             padding: 20px !important;
         }
-        
-        /* TEKS DI DALAM UPLOADER JADI PUTIH */
         div[data-testid="stFileUploader"] *,
         .stFileUploader * {
-            color: #FFFFFF !important;
+            color: #6A1B4D !important;
             background: transparent !important;
         }
-        
-        /* TOMBOL "Browse files" DI UPLOADER */
         div[data-testid="stFileUploader"] button,
         .stFileUploader button {
             background: linear-gradient(135deg, #EC407A, #D81B60) !important;
@@ -151,7 +149,7 @@ st.markdown("""
             background: rgba(236, 64, 122, 0.2) !important;
         }
         
-        /* ===== TOMBOL PROSES (TEKS PUTIH) ===== */
+        /* ===== TOMBOL PROSES ===== */
         .stButton button {
             background: linear-gradient(135deg, #EC407A, #D81B60) !important;
             color: white !important;
