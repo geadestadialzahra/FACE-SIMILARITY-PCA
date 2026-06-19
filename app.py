@@ -33,7 +33,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# 2. CSS - TEMA PINK (DENGAN UKURAN TOMBOL DIPERBESAR)
+# 2. CSS - TEMA PINK + TOMBOL BESAR
 # ==========================================
 st.markdown("""
     <style>
@@ -181,20 +181,19 @@ st.markdown("""
         }
 
         /* =========================================================
-           ===== NAVIGASI TOMBOL (UKURAN DIPERBESAR) =====
+           ===== NAVIGASI TOMBOL (BESAR + ANIMASI) =====
            ========================================================= */
-        /* Tombol navigasi di sidebar - ukuran dasar diperbesar */
         .stSidebar .stButton button {
-            width: 56px !important;
-            height: 56px !important;
-            min-width: 56px !important;
-            min-height: 56px !important;
-            max-width: 56px !important;
-            max-height: 56px !important;
+            width: 60px !important;
+            height: 60px !important;
+            min-width: 60px !important;
+            min-height: 60px !important;
+            max-width: 60px !important;
+            max-height: 60px !important;
             border-radius: 50% !important;
-            border: 2px solid transparent !important;
+            border: none !important;
             background: transparent !important;
-            font-size: 28px !important;
+            font-size: 32px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -203,16 +202,12 @@ st.markdown("""
             box-shadow: none !important;
             transition: all 0.3s ease !important;
             line-height: 1 !important;
-            transform: translateY(0) !important; /* hilangkan efek turun */
         }
-        /* Hover efek */
         .stSidebar .stButton button:hover {
             transform: scale(1.08) !important;
-            background: rgba(236, 64, 122, 0.12) !important;
+            background: rgba(236, 64, 122, 0.1) !important;
             box-shadow: none !important;
-            border-color: rgba(236, 64, 122, 0.3) !important;
         }
-        /* Tombol aktif (akan ditambah melalui JS di loop) */
         .sidebar-caption {
             text-align: center;
             color: #AD1457;
@@ -610,7 +605,7 @@ def halaman_deteksi():
                     """, unsafe_allow_html=True)
 
 # ==========================================
-# 5. NAVIGASI SIDEBAR (TOMBOL BLOK WARNA - DIPERBESAR)
+# 5. NAVIGASI SIDEBAR (TOMBOL BESAR + AKTIF TURUN)
 # ==========================================
 st.sidebar.markdown("🌸 **Haloo!!**")
 
@@ -628,19 +623,15 @@ cols = st.sidebar.columns(4)
 for col, (emoji, page_name) in zip(cols, menus):
     with col:
         is_active = (st.session_state.page == page_name)
-        # Tombol aktif: background block pink + ukuran lebih besar
+        # Tombol aktif: background pink + turun sedikit + bayangan
         if is_active:
             st.markdown(f"""
                 <style>
                     .stSidebar .stButton button[data-testid="baseButton-secondary"]:has(> div:contains("{emoji}")) {{
                         background: #F8BBD0 !important;
-                        border: 2px solid #EC407A !important;
-                        transform: scale(1.1) !important;
-                        width: 60px !important;
-                        height: 60px !important;
-                        font-size: 32px !important;
-                        box-shadow: 0 0 20px rgba(236,64,122,0.25) !important;
-                        margin: 0 !important;
+                        transform: translateY(4px) scale(1.02) !important;
+                        box-shadow: 0 4px 12px rgba(236,64,122,0.3) !important;
+                        border: none !important;
                     }}
                 </style>
             """, unsafe_allow_html=True)
