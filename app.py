@@ -1,4 +1,4 @@
-# app.py - VERSI FINAL (LABEL FOTO DI DALAM CARD + KATEGORI CUKUP MIRIP)
+# app.py - VERSI FINAL (SEMUA LABEL DI DALAM CARD)
 # =====================================================
 
 import streamlit as st
@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# 2. CSS SUPER KUAT (PAKSA PINK, TAHAN DARK MODE)
+# 2. CSS SUPER KUAT (PAKSA PINK)
 # ==========================================
 st.markdown("""
     <style>
@@ -130,6 +130,10 @@ st.markdown("""
             border: 1px solid #F8BBD0 !important;
             box-shadow: 0 4px 15px rgba(233, 30, 99, 0.1) !important;
         }
+        .result-card h4, .result-card h3, .result-card h2 {
+            color: #AD1457 !important;
+            margin-bottom: 8px !important;
+        }
         .stMetric {
             background: rgba(255, 255, 255, 0.3) !important;
             border-radius: 12px !important;
@@ -150,11 +154,6 @@ st.markdown("""
         .stPlotlyChart, .stMatplotlib {
             background: transparent !important;
         }
-        .result-card h4, .result-card h3, .result-card h2 {
-            color: #AD1457 !important;
-            margin-bottom: 8px !important;
-        }
-        /* WARNA UNTUK KATEGORI CUKUP MIRIP */
         .stWarning {
             background-color: rgba(255, 193, 7, 0.15) !important;
             border-radius: 12px !important;
@@ -319,7 +318,7 @@ if st.button("🚀 Proses Deteksi Sekarang", use_container_width=True):
             progress_bar.empty()
             
             # ==========================================
-            # 9. TAMPILKAN HASIL (LABEL DI DALAM CARD + KATEGORI CUKUP MIRIP)
+            # 9. TAMPILKAN HASIL (SEMUA LABEL DI DALAM CARD)
             # ==========================================
             st.markdown("---")
             st.subheader("📊 Hasil Deteksi")
@@ -328,19 +327,19 @@ if st.button("🚀 Proses Deteksi Sekarang", use_container_width=True):
             
             with col_r1:
                 st.markdown('<div class="result-card">', unsafe_allow_html=True)
-                st.markdown("**📸 Foto Pertama**")
+                st.markdown("#### 📸 Foto Pertama")
                 st.image(img1_color, caption=f"Resize {IMG_SIZE[0]}x{IMG_SIZE[1]}", use_container_width=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             
             with col_r2:
                 st.markdown('<div class="result-card">', unsafe_allow_html=True)
-                st.markdown("**📸 Foto Kedua**")
+                st.markdown("#### 📸 Foto Kedua")
                 st.image(img2_color, caption=f"Resize {IMG_SIZE[0]}x{IMG_SIZE[1]}", use_container_width=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             
             with col_r3:
                 st.markdown('<div class="result-card">', unsafe_allow_html=True)
-                st.markdown("### 🎯 Skor Kemiripan")
+                st.markdown("#### 🎯 Skor Kemiripan")
                 st.markdown(f"<h1 style='color:#AD1457;font-size:42px;'>{similarity:.2%}</h1>", unsafe_allow_html=True)
                 
                 # ===== LOGIKA KATEGORI =====
