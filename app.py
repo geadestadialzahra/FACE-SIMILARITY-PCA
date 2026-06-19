@@ -1,4 +1,4 @@
-# app.py - VERSI FINAL (PAKSA TEMA LIGHT)
+# app.py - VERSI FINAL (PAKSA TEMA LIGHT + UPLOADER PINK)
 # =====================================================
 
 import streamlit as st
@@ -11,7 +11,7 @@ import cv2
 import time
 
 # ==========================================
-# 1. PENGATURAN HALAMAN
+# 1. PENGATURAN HALAMAN (PAKSA LIGHT MODE)
 # ==========================================
 st.set_page_config(
     page_title="PCA Face Similarity",
@@ -21,34 +21,35 @@ st.set_page_config(
 )
 
 # ==========================================
-# 2. CSS SUPER KUAT (PAKSA LIGHT MODE)
+# 2. CSS SANGAT KUAT (UNGGULI DARK MODE)
 # ==========================================
 st.markdown("""
     <style>
-        /* ===== FORCE LIGHT MODE PADA SEMUA ELEMEN ===== */
+        /* === RESET SEMUA WARNA GELAP === */
         .stApp, .main, .block-container, section.main, div[data-testid="stSidebar"] {
             background-color: #FFF0F5 !important;
             background-image: none !important;
+            color: #6A1B4D !important;
         }
-        
-        /* ===== SEMUA TEKS JADI PINK GELAP ===== */
+
+        /* === SEMUA TEKS JADI PINK === */
         body, p, div, span, label, h1, h2, h3, h4, h5, h6 {
             color: #6A1B4D !important;
         }
-        
-        /* ===== HEADER (BAR ATAS) ===== */
+
+        /* === HEADER (BAR ATAS) ===== */
         header {
             background: linear-gradient(135deg, #880E4F, #AD1457) !important;
             border-bottom: 2px solid #F8BBD0 !important;
         }
-        
-        /* ===== SIDEBAR ===== */
+
+        /* === SIDEBAR ===== */
         .css-1d391kg, .css-12w0qpk, [data-testid="stSidebar"] {
             background: linear-gradient(180deg, #FCE4EC, #FFF0F5) !important;
             border-right: 2px solid #F8BBD0 !important;
         }
-        
-        /* ===== JUDUL ===== */
+
+        /* === JUDUL ===== */
         .main-title {
             color: #AD1457 !important;
             font-size: 42px !important;
@@ -59,18 +60,18 @@ st.markdown("""
             color: #D81B60 !important;
             font-size: 18px !important;
         }
-        
-        /* ===== SEMUA HEADING ===== */
+
+        /* === SEMUA HEADING ===== */
         h1, h2, h3, h4, h5, h6, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4 {
             color: #AD1457 !important;
             font-weight: bold !important;
         }
-        
+
         /* =========================================================
-           ===== FILE UPLOADER (PAKSA LIGHT) =====
+           ===== FILE UPLOADER (PAKSA PINK) =====
            ========================================================= */
-        
-        /* Container utama */
+
+        /* Container utama file uploader */
         div[data-testid="stFileUploader"] {
             background: linear-gradient(135deg, #FCE4EC, #FFF0F5) !important;
             border: 2px dashed #EC407A !important;
@@ -78,14 +79,14 @@ st.markdown("""
             padding: 10px !important;
             box-shadow: none !important;
         }
-        
+
         /* Area drop zone */
         div[data-testid="stFileUploader"] > div {
             background: rgba(255, 255, 255, 0.6) !important;
             border-radius: 8px !important;
             padding: 20px !important;
         }
-        
+
         /* Semua teks di dalam uploader */
         div[data-testid="stFileUploader"] label,
         div[data-testid="stFileUploader"] p,
@@ -94,19 +95,19 @@ st.markdown("""
             color: #6A1B4D !important;
             background: transparent !important;
         }
-        
+
         /* Tulisan "Upload" besar */
         div[data-testid="stFileUploader"] .st-emotion-cache-1v0mbdj {
             color: #6A1B4D !important;
             font-weight: bold !important;
             font-size: 18px !important;
         }
-        
+
         /* Tulisan "200MB per file..." */
         div[data-testid="stFileUploader"] .st-emotion-cache-1r6slb0 {
             color: #8B4A6D !important;
         }
-        
+
         /* Tombol "Browse files" */
         div[data-testid="stFileUploader"] button {
             background: linear-gradient(135deg, #EC407A, #D81B60) !important;
@@ -120,7 +121,7 @@ st.markdown("""
             transform: scale(1.05) !important;
             box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3) !important;
         }
-        
+
         /* Hover pada area upload */
         div[data-testid="stFileUploader"]:hover {
             border-color: #D81B60 !important;
@@ -129,7 +130,7 @@ st.markdown("""
         div[data-testid="stFileUploader"]:hover > div {
             background: rgba(255, 255, 255, 0.8) !important;
         }
-        
+
         /* ===== TOMBOL SAKURA DI SIDEBAR ===== */
         .sakura-btn-container .stButton button {
             background: transparent !important;
@@ -151,7 +152,7 @@ st.markdown("""
             background: rgba(236, 64, 122, 0.2) !important;
             box-shadow: 0 0 20px rgba(236, 64, 122, 0.3) !important;
         }
-        
+
         /* ===== TOMBOL PROSES ===== */
         .stButton button {
             background: linear-gradient(135deg, #EC407A, #D81B60) !important;
@@ -167,7 +168,7 @@ st.markdown("""
             transform: scale(1.03) translateY(-2px) !important;
             box-shadow: 0 8px 25px rgba(233, 30, 99, 0.4) !important;
         }
-        
+
         /* ===== CARD HASIL ===== */
         .result-card {
             background: linear-gradient(135deg, #FCE4EC, #FFF0F5) !important;
@@ -177,20 +178,20 @@ st.markdown("""
             border: 1px solid #F8BBD0 !important;
             box-shadow: 0 4px 15px rgba(233, 30, 99, 0.1) !important;
         }
-        
+
         /* ===== SLIDER ===== */
         .stSlider > div {
             background: rgba(255, 255, 255, 0.4) !important;
             border-radius: 10px !important;
         }
-        
+
         /* ===== METRIC ===== */
         .stMetric {
             background: rgba(255, 255, 255, 0.3) !important;
             border-radius: 12px !important;
             padding: 10px !important;
         }
-        
+
         /* ===== SUCCESS / WARNING / ERROR ===== */
         .stAlert {
             border-radius: 12px !important;
