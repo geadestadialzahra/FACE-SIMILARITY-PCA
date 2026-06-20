@@ -226,6 +226,19 @@ for col, (emoji, page_name) in zip(cols, menus):
     with col:
         is_active = (st.session_state.page == page_name)
 
+        # Jika tombol aktif, tambahkan CSS untuk memberi efek
+        if is_active:
+            st.markdown(f"""
+                <style>
+                    /* Target tombol yang sedang aktif */
+                    .stSidebar .stButton button[data-testid="baseButton-secondary"]:has(> div:contains("{emoji}")) {{
+                        background: #F8BBD0 !important;           /* Pink tua */
+                        transform: translateY(2px) scale(1.03) !important;
+                        box-shadow: 0 4px 14px rgba(236,64,122,0.25) !important;
+                        border: none !important;
+                    }}
+                </style>
+            """, unsafe_allow_html=True)
         # Tombol navigasi
         if st.button(emoji, key=f"nav_{emoji}", use_container_width=True):
             st.session_state.page = page_name
