@@ -47,7 +47,6 @@ def tampilkan():
 
         st.divider()
         st.markdown("""
-    <div style="background: rgba(255,255,255,0.4); padding: 20px; border-radius: 15px; border-left: 5px solid #EC407A; margin-bottom: 20px;">
         <h2 style="color: #AD1457; margin-top: 0;">🌸 Halo! Selamat datang di halaman Deteksi Kemiripan Wajah.</h2>
         <p style="color: #6A1B4D; font-size: 16px; line-height: 1.6;">
             Di sini kamu bisa membandingkan dua foto wajah untuk melihat apakah kedua orang tersebut 
