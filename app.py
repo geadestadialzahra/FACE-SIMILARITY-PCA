@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 
 # ======================== KONFIGURASI HALAMAN ========================
 st.set_page_config(
-    page_title="LANG APP",
+    page_title="ANGEL APP",
     page_icon="🌸",
     layout="wide"
 )
@@ -502,7 +502,7 @@ if page == "🏠 Home":
     st.markdown("""
     <div class="home-header">
         <div class="bling-shower">✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨ ✨</div>
-        <h1>🌸 Selamat Datang di Aplikasi LANG</h1>
+        <h1>🌸 Selamat Datang di Aplikasi ANGEL</h1>
         <p style="font-size:1.3rem; color:#BF360C; font-weight:500;">
             Tempat terbaik untuk mengolah gambar Anda dengan sentuhan kecantikan.
         </p>
