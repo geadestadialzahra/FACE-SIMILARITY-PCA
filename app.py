@@ -516,6 +516,7 @@ anggota = [
         "ig": "@gea_destadia_10",
         "telp": "0831-5068-7481",
         "foto": "assets/gea.jpg"
+        
     },
     {
         "inisial": "LA",
@@ -523,6 +524,7 @@ anggota = [
         "ig": "@luunaaamiiii",
         "telp": "0895-3780-96802",
         "foto": "assets/luna.jpg"
+        
     },
     {
         "inisial": "NA",
@@ -530,6 +532,7 @@ anggota = [
         "ig": "@ndyyzh",
         "telp": "0858-4631-3309",
         "foto": "assets/nadia.jpg"
+        
     },
     {
         "inisial": "DAAD",
@@ -537,6 +540,7 @@ anggota = [
         "ig": "@adellianav",
         "telp": "0813-1211-6787",
         "foto": "assets/dalilah.jpg"
+        
     },
 ]
 
