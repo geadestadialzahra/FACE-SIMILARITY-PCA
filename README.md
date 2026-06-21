@@ -73,8 +73,21 @@ cd FACE-SIMILARITY-PCA
 ---
 
 ## 📞 Kontak
+Gea Destadia Al-Zahra
+IG = @gea_destadia_10
+WA = 0831-5068-7481
 
-Jika ada pertanyaan, silakan hubungi ketua kelompok melalui instagram atau whatsapp yang tertera di app.
+Luna Amilia
+IG = @luunaaamiiii
+Email = lunaamilia0@gmail.com
+
+Nadia Azizah
+IG = @ndyyzh
+WA = 0858-4631-3309
+
+Dalilah Arifah Ariandi DJR
+IG = @adellianav
+WA = 0813-1211-6787
 
 ---
 
