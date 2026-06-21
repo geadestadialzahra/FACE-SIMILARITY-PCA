@@ -799,7 +799,7 @@ elif page == "🌫️ Grayscale":
     """, unsafe_allow_html=True)
 
 elif page == "🗜️ Kompresi":
-    # ==================== KOMPRESI PCA WARNA (RGB) ====================
+    # ==================== KOMPRESI PCA WARNA (RGB) - TIDAK DIUBAH KE GRAYSCALE ====================
     if not st.session_state.kompresi_visited:
         st.balloons()
         st.session_state.kompresi_visited = True
@@ -834,10 +834,12 @@ elif page == "🗜️ Kompresi":
     )
 
     if uploaded_file is not None:
+        # Baca gambar RGB
         image = Image.open(uploaded_file).convert("RGB")
         img_array = np.array(image, dtype=np.float32)
         h, w, c = img_array.shape  # c = 3
 
+        # Pilihan mode: berdasarkan jumlah komponen (k) atau persentase varians
         mode = st.radio(
             "Pilih mode pengaturan kompresi:",
             ["Jumlah komponen (k)", "Persentase varians"],
@@ -845,7 +847,7 @@ elif page == "🗜️ Kompresi":
             key="kompresi_mode"
         )
 
-        max_k = min(h, w)
+        max_k = min(h, w)  # batas maksimum k (tidak boleh lebih dari dimensi)
 
         if mode == "Jumlah komponen (k)":
             k = st.slider(
@@ -857,7 +859,7 @@ elif page == "🗜️ Kompresi":
                 key="k_slider"
             )
             variance_target = None
-        else:
+        else:  # Persentase varians
             variance_target = st.slider(
                 "Persentase varians yang dipertahankan (%)",
                 min_value=50,
@@ -870,7 +872,9 @@ elif page == "🗜️ Kompresi":
 
         if st.button("🚀 Kompresi dengan PCA", use_container_width=True):
             try:
+                # Tentukan k jika mode persentase varians
                 if mode == "Persentase varians":
+                    # Fit PCA pada channel R untuk mendapatkan explained variance
                     pca_full = PCA()
                     pca_full.fit(img_array[:, :, 0])
                     cumsum = np.cumsum(pca_full.explained_variance_ratio_)
@@ -879,35 +883,43 @@ elif page == "🗜️ Kompresi":
                         k = max_k
                     st.info(f"Untuk mempertahankan {variance_target*100:.0f}% varians, diperlukan k = {k} komponen.")
 
+                # Pastikan k tidak melebihi dimensi
                 if k > max_k:
                     k = max_k
                     st.warning(f"k dibatasi hingga {max_k} karena dimensi gambar.")
 
+                # Lakukan PCA pada setiap channel dengan k komponen
                 channels_recon = []
                 for i in range(3):
-                    channel = img_array[:, :, i]
+                    channel = img_array[:, :, i]  # shape (h, w)
                     pca = PCA(n_components=k)
-                    reduced = pca.fit_transform(channel)
-                    recon = pca.inverse_transform(reduced)
+                    reduced = pca.fit_transform(channel)  # (h, k)
+                    recon = pca.inverse_transform(reduced)  # (h, w)
                     channels_recon.append(recon)
 
-                reconstructed = np.stack(channels_recon, axis=2)
+                # Gabungkan channel
+                reconstructed = np.stack(channels_recon, axis=2)  # (h, w, 3)
                 reconstructed = np.clip(reconstructed, 0, 255).astype(np.uint8)
                 img_reconstructed = Image.fromarray(reconstructed, mode='RGB')
 
+                # Hitung metrik kualitas (multichannel)
                 img_norm = img_array / 255.0
                 recon_norm = reconstructed / 255.0
+                # SSIM dengan channel_axis=2
                 ssim_val = ssim(img_norm, recon_norm, channel_axis=2, data_range=1.0)
+                # PSNR rata-rata per channel
                 psnr_vals = []
                 for i in range(3):
                     psnr_vals.append(psnr(img_norm[:, :, i], recon_norm[:, :, i], data_range=1.0))
                 psnr_val = np.mean(psnr_vals)
 
+                # Ukuran dan penghematan (perkiraan)
                 ukuran_asli = h * w * 3
-                ukuran_baru = (h * k + k * w) * 3
+                ukuran_baru = (h * k + k * w) * 3  # koefisien + komponen untuk 3 channel
                 rasio = ukuran_baru / ukuran_asli
                 penghematan = (1 - rasio) * 100
 
+                # Tampilkan gambar
                 col1, col2 = st.columns(2)
                 with col1:
                     st.markdown('<div class="image-card">', unsafe_allow_html=True)
@@ -923,6 +935,7 @@ elif page == "🗜️ Kompresi":
                     st.markdown(f"*Ukuran: {w} x {h} px*")
                     st.markdown('</div>', unsafe_allow_html=True)
 
+                # Tombol download
                 buf = io.BytesIO()
                 img_reconstructed.save(buf, format="PNG")
                 byte_im = buf.getvalue()
@@ -931,6 +944,7 @@ elif page == "🗜️ Kompresi":
                 href += '<button class="download-btn">⬇️ Download Hasil Kompresi</button></a>'
                 st.markdown(href, unsafe_allow_html=True)
 
+                # --- Metrik Kualitas ---
                 st.markdown("---")
                 st.markdown("### 📊 Metrik Kualitas")
                 col_m1, col_m2, col_m3, col_m4 = st.columns(4)
@@ -939,6 +953,7 @@ elif page == "🗜️ Kompresi":
                 col_m3.metric("Penghematan", f"{penghematan:.1f}%")
                 col_m4.metric("Rasio Kompresi", f"{rasio:.4f}")
 
+                # Detail kompresi
                 st.markdown("### 📋 Detail Kompresi")
                 st.markdown(f"""
                 <div class="detail-comp">
@@ -951,6 +966,7 @@ elif page == "🗜️ Kompresi":
                 </div>
                 """, unsafe_allow_html=True)
 
+                # --- Kesimpulan Kualitas Kompresi ---
                 st.markdown("### 📝 Kesimpulan Kualitas Kompresi")
                 if ssim_val > 0.95 and penghematan > 30:
                     kesimpulan = "✅ **Kompresi sangat baik!** Gambar terkompresi memiliki kualitas hampir sama dengan asli (SSIM > 0.95) dengan penghematan ukuran yang signifikan (>30%)."
@@ -962,6 +978,7 @@ elif page == "🗜️ Kompresi":
                     kesimpulan = "❌ **Kompresi kurang baik.** Kualitas visual menurun signifikan (SSIM ≤ 0.70). Sebaiknya naikkan jumlah komponen (k) untuk hasil lebih baik."
                 st.markdown(f'<div class="info-box">{kesimpulan}</div>', unsafe_allow_html=True)
 
+                # Tambahan keterangan interpretasi metrik
                 st.markdown("""
                 <div style="background: #FCE4EC; padding: 1rem; border-radius: 12px; margin-top: 1rem; border: 1px solid #EC407A;">
                     <p style="margin:0;"><b>💡 Interpretasi Metrik:</b><br>
@@ -973,7 +990,9 @@ elif page == "🗜️ Kompresi":
                 </div>
                 """, unsafe_allow_html=True)
 
+                # --- Kurva Akumulasi Informasi PCA (channel R) ---
                 st.markdown("### 📈 Kurva Akumulasi Informasi PCA (Channel R)")
+                # Fit PCA full pada channel R untuk kurva
                 pca_full = PCA()
                 pca_full.fit(img_array[:, :, 0])
                 cumsum_var = np.cumsum(pca_full.explained_variance_ratio_)
@@ -1045,7 +1064,7 @@ elif page == "🔍 Deteksi":
     # Upload data latih (opsional)
     st.markdown("---")
     st.markdown("#### 📂 Data Latih (Opsional)")
-    st.markdown("Upload folder berisi gambar wajah untuk melatih PCA. Jika tidak diisi, akan digunakan dua gambar yang dibandingkan (dengan PCA 1 komponen).")
+    st.markdown("Upload folder berisi gambar wajah untuk melatih PCA. Jika tidak diisi, akan digunakan dua gambar yang dibandingkan (dengan augmentasi).")
     uploaded_zip = st.file_uploader("Unggah file ZIP berisi gambar wajah", type=["zip"], key="train_zip")
 
     # Parameter
@@ -1053,11 +1072,11 @@ elif page == "🔍 Deteksi":
     with col_param1:
         n_components = st.slider(
             "Jumlah komponen PCA (k)",
-            min_value=1,
+            min_value=2,
             max_value=50,
             value=9,
             step=1,
-            help="Semakin banyak komponen, semakin detail fitur wajah yang digunakan. (Jika tanpa data latih, k=1)"
+            help="Semakin banyak komponen, semakin detail fitur wajah yang digunakan."
         )
     with col_param2:
         threshold = st.slider(
@@ -1088,8 +1107,6 @@ elif page == "🔍 Deteksi":
 
                 # Siapkan data latih
                 train_vectors = []
-                use_zip = False
-
                 if uploaded_zip is not None:
                     # Ekstrak zip
                     with tempfile.TemporaryDirectory() as tmpdir:
@@ -1106,27 +1123,29 @@ elif page == "🔍 Deteksi":
                                         train_vectors.append(vec)
                                     except:
                                         continue
-                    if len(train_vectors) >= 2:
-                        use_zip = True
-                        st.success(f"✅ Data latih berhasil dimuat! Jumlah gambar: {len(train_vectors)}")
-                    else:
+                    if len(train_vectors) < 2:
                         st.warning("Data latih kurang dari 2 gambar. Gunakan data latih default.")
+                        train_vectors = []
                 
-                # Jika tidak ada data latih atau kurang, gunakan dua gambar sebagai data latih
-                if not use_zip:
-                    # Data latih hanya dua gambar, maka PCA hanya bisa 1 komponen
-                    n_components_actual = 1
-                    train_vectors = np.array([arr1, arr2])
-                    st.info(f"ℹ️ Tidak ada data latih yang cukup. Gunakan 2 gambar sebagai data latih dengan k=1.")
-                else:
-                    # Gunakan data latih dari zip, batasi n_components sesuai jumlah sampel
-                    n_components_actual = min(n_components, len(train_vectors)-1, len(train_vectors[0]))
-                    train_vectors = np.array(train_vectors)
-                    if n_components_actual < n_components:
-                        st.warning(f"Jumlah komponen dibatasi menjadi {n_components_actual} karena data latih hanya {len(train_vectors)} gambar.")
-
+                # Jika tidak ada data latih atau kurang, gunakan dua gambar + augmentasi
+                if len(train_vectors) < 2:
+                    # Buat data sintetis dengan augmentasi (flip, rotasi kecil, noise)
+                    train_vectors = [arr1, arr2]
+                    # Tambahkan variasi dari arr1 dan arr2
+                    for arr in [arr1, arr2]:
+                        for _ in range(5):
+                            noise = np.random.normal(0, 0.05, arr.shape)
+                            train_vectors.append(np.clip(arr + noise, 0, 1))
+                        # flip horizontal (dengan reshape dulu)
+                        reshaped = arr.reshape(100, 100)
+                        flipped = np.fliplr(reshaped).flatten()
+                        train_vectors.append(flipped)
+                    st.info("ℹ️ Tidak ada data latih. Digunakan 2 gambar + augmentasi (flip & noise) untuk melatih PCA.")
+                
+                # Ubah ke numpy array
+                train_vectors = np.array(train_vectors)
                 # PCA
-                pca = PCA(n_components=n_components_actual)
+                pca = PCA(n_components=min(n_components, len(train_vectors)-1, len(train_vectors[0])))
                 pca.fit(train_vectors)
                 # Proyeksikan dua gambar
                 vec1_pca = pca.transform([arr1])[0]
@@ -1147,35 +1166,34 @@ elif page == "🔍 Deteksi":
                 st.markdown(f'<div class="detail">Varians: {var_ratio:.1f}%</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
 
-                # Grafik akumulasi informasi PCA (hanya jika data latih > 2)
-                if len(train_vectors) > 2:
-                    st.markdown("### 📈 Grafik Akumulasi Informasi PCA")
-                    cumsum_var = np.cumsum(pca.explained_variance_ratio_)
-                    fig, ax = plt.subplots(figsize=(8, 5))
-                    ax.plot(range(1, len(cumsum_var)+1), cumsum_var, 'b-', linewidth=2, label='Kurva Akumulasi')
-                    ax.axhline(y=0.95, color='r', linestyle='--', alpha=0.7, label='95% Varians')
-                    ax.axhline(y=threshold, color='g', linestyle='--', alpha=0.7, label=f'Threshold {threshold*100:.0f}%')
-                    ax.axvline(x=pca.n_components, color='orange', linestyle=':', alpha=0.7, label=f'k = {pca.n_components}')
-                    ax.set_xlabel('Jumlah Komponen (k)')
-                    ax.set_ylabel('Akumulasi Varians')
-                    ax.set_title('Kurva Akumulasi Informasi PCA')
-                    ax.grid(True, alpha=0.3)
-                    ax.legend()
-                    st.pyplot(fig)
-                    plt.close(fig)
+                # Grafik akumulasi informasi PCA
+                st.markdown("### 📈 Grafik Akumulasi Informasi PCA")
+                cumsum_var = np.cumsum(pca.explained_variance_ratio_)
+                fig, ax = plt.subplots(figsize=(8, 5))
+                ax.plot(range(1, len(cumsum_var)+1), cumsum_var, 'b-', linewidth=2, label='Kurva Akumulasi')
+                ax.axhline(y=0.95, color='r', linestyle='--', alpha=0.7, label='95% Varians')
+                ax.axhline(y=threshold, color='g', linestyle='--', alpha=0.7, label=f'Threshold {threshold*100:.0f}%')
+                ax.axvline(x=pca.n_components, color='orange', linestyle=':', alpha=0.7, label=f'k = {pca.n_components}')
+                ax.set_xlabel('Jumlah Komponen (k)')
+                ax.set_ylabel('Akumulasi Varians')
+                ax.set_title('Kurva Akumulasi Informasi PCA')
+                ax.grid(True, alpha=0.3)
+                ax.legend()
+                st.pyplot(fig)
+                plt.close(fig)
 
-                    # Penjelasan grafik
-                    st.markdown("""
-                    <div style="background: #FCE4EC; padding: 1rem; border-radius: 12px; margin-top: 1rem; border: 1px solid #EC407A;">
-                        <p style="margin:0;"><b>💡 Cara baca grafik:</b><br>
-                        • <b>Garis biru</b> → akumulasi varians. Semakin tinggi, semakin banyak informasi yang dipertahankan.<br>
-                        • <b>Garis merah putus-putus</b> → 95% varians data sudah terwakili.<br>
-                        • <b>Garis hijau putus-putus</b> → threshold kemiripan yang Anda atur.<br>
-                        • <b>Garis oranye</b> → jumlah komponen PCA yang digunakan (k).<br>
-                        Dengan k yang cukup, kita bisa meringkas wajah menjadi beberapa angka tanpa kehilangan banyak informasi.
-                        </p>
-                    </div>
-                    """, unsafe_allow_html=True)
+                # Penjelasan grafik
+                st.markdown("""
+                <div style="background: #FCE4EC; padding: 1rem; border-radius: 12px; margin-top: 1rem; border: 1px solid #EC407A;">
+                    <p style="margin:0;"><b>💡 Cara baca grafik:</b><br>
+                    • <b>Garis biru</b> → akumulasi varians. Semakin tinggi, semakin banyak informasi yang dipertahankan.<br>
+                    • <b>Garis merah putus-putus</b> → 95% varians data sudah terwakili.<br>
+                    • <b>Garis hijau putus-putus</b> → threshold kemiripan yang Anda atur.<br>
+                    • <b>Garis oranye</b> → jumlah komponen PCA yang digunakan (k).<br>
+                    Dengan k yang cukup, kita bisa meringkas wajah menjadi beberapa angka tanpa kehilangan banyak informasi.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
 
                 st.balloons()
 
@@ -1188,6 +1206,6 @@ elif page == "🔍 Deteksi":
     st.markdown("""
     <div class="footer-note">
         <p>📌 <b>Keterangan:</b> Deteksi kemiripan menggunakan PCA (Eigenfaces) dan Cosine Similarity. 
-        Upload data latih (ZIP) untuk hasil lebih akurat. Jika tidak ada, sistem menggunakan 2 gambar dengan k=1 (hasil 100% untuk gambar identik).</p>
+        Upload data latih (ZIP) untuk hasil lebih akurat, atau biarkan sistem menggunakan augmentasi otomatis.</p>
     </div>
     """, unsafe_allow_html=True)
