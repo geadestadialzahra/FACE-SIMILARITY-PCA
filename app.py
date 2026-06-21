@@ -44,7 +44,7 @@ st.markdown("""
         /* ----- SIDEBAR DEKORASI (padding atas dikurangi) ----- */
         .sidebar-header {
             text-align: center;
-            padding: 5px 0 5px 0;  /* padding atas kecil */
+            padding: 5px 0 5px 0;
             border-bottom: 2px solid #F8BBD0;
             margin-bottom: 10px;
         }
@@ -502,7 +502,7 @@ anggota = [
         "nama": "Gea Destadia Al-Zahra",
         "ig": "@gea_destadia_10",
         "telp": "0831-5068-7481",
-        "foto": "assets/gea.jpg"   # opsional
+        "foto": "assets/gea.jpg"
     },
     {
         "inisial": "LA",
@@ -528,7 +528,6 @@ anggota = [
 ]
 
 for member in anggota:
-    # Tampilkan inisial sebagai avatar (jika ada foto, tampilkan foto, jika tidak pakai inisial)
     foto_b64 = get_image_base64(member.get("foto", ""))
     if foto_b64:
         avatar_html = f'<img src="data:image/jpeg;base64,{foto_b64}" />'
@@ -539,7 +538,7 @@ for member in anggota:
     <div class="profile-item">
         <div class="profile-avatar">{avatar_html}</div>
         <div class="profile-info">
-            <div class="name">{member['nama']}</div>
+            <div class="name">• {member['nama']} •</div>
             <div class="detail">📸 {member['ig']}</div>
             <div class="detail">📞 {member['telp']}</div>
         </div>
