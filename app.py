@@ -329,7 +329,7 @@ anggota = [
         "nama": "Gea Destadia Al-Zahra",
         "ig": "@gea_destadia_10",
         "telp": "0831-5068-7481",
-        "foto": "assets/C:\Users\acer\OneDrive\Pictures\Camera Roll\WIN_20260610_11_03_00_Pro.jpg"  # ganti dengan path foto Anda
+        "foto": "assets/https://scholar.googleusercontent.com/citations?view_op=medium_photo&user=IKgMGc0AAAAJ&citpid=6"  # ganti dengan path foto Anda
     },
     {
         "nama": "Luna Amilia",
