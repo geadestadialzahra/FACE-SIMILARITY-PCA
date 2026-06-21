@@ -1,7 +1,8 @@
 # 🌸 ANGEL – Aplikasi PCA untuk Grayscale, Kompresi, & Deteksi Kemiripan Wajah
 
 Aplikasi berbasis web untuk mengolah gambar menggunakan **Principal Component Analysis (PCA)**.  
-Dibangun dengan **Streamlit** dan dikembangkan oleh **Kelompok 2 – Mahasiswa Sarjana Teknik Informatika Universitas Negeri Semarang**.
+Dibangun dengan **Streamlit** dan dikembangkan oleh **Kelompok 2**.  
+Untuk memenuhi proyek akhir Mata Kuliah **Aljabar Linear**
 
 ---
 
@@ -52,7 +53,7 @@ project:
 - **Dalilah Arifah Ariandi DJR**
 - **Nadia Azzizah**
 
-**Universitas Negeri Semarang** – Teknik Informatika
+**Universitas Negeri Semarang** – Sarjana Teknik Informatika
 
 ---
 
