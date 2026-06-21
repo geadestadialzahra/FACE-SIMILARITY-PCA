@@ -41,7 +41,7 @@ st.markdown("""
             font-weight: bold !important;
         }
 
-        /* ----- SIDEBAR DEKORASI (padding atas dikurangi) ----- */
+        /* ----- SIDEBAR DEKORASI ----- */
         .sidebar-header {
             text-align: center;
             padding: 5px 0 5px 0;
@@ -161,12 +161,10 @@ st.markdown("""
             margin-bottom: 8px;
         }
 
-        /* ----- PROFIL TIM DI SIDEBAR (kotak per anggota) ----- */
+        /* ----- PROFIL TIM DI SIDEBAR (KOTAK PER ANGGOTA) ----- */
         .sidebar-profile {
             margin-top: 8px;
             padding: 5px 5px;
-            background: transparent !important;
-            border: none !important;
         }
         .sidebar-profile h4 {
             color: #AD1457;
@@ -177,11 +175,11 @@ st.markdown("""
         .sidebar-profile .profile-item {
             display: flex;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 14px !important;       /* jarak antar kotak */
             padding: 12px 14px;
             border-radius: 14px;
-            background: #ffffff !important;          /* putih solid */
-            border: 2px solid #EC407A !important;   /* kotak pink tegas */
+            background: #ffffff !important;
+            border: 2px solid #EC407A !important;  /* kotak tegas */
             box-shadow: 0 4px 12px rgba(173,20,87,0.15);
             transition: 0.2s;
         }
@@ -282,6 +280,21 @@ st.markdown("""
         }
         .info-box b {
             color: #AD1457;
+        }
+
+        /* ----- KOTAK KETERANGAN TAMBAHAN (di bawah setiap halaman) ----- */
+        .footer-note {
+            background: linear-gradient(135deg, #FFF9C4, #FFE082);
+            border-radius: 16px;
+            padding: 1.2rem 2rem;
+            margin-top: 2rem;
+            border: 1px solid #FFB300;
+            text-align: center;
+            color: #BF360C;
+        }
+        .footer-note p {
+            margin: 0;
+            font-size: 1rem;
         }
 
         /* ----- GAYA KHUSUS HOME (bling-bling) ----- */
@@ -426,7 +439,7 @@ def get_image_base64(path_or_url):
     return None
 
 # ======================== SIDEBAR NAVIGASI & PROFIL ========================
-# --- HEADER SIDEBAR (Dekorasi) ---
+# --- HEADER SIDEBAR ---
 st.sidebar.markdown("""
 <div class="sidebar-header">
     <span class="logo">🌸</span>
@@ -489,13 +502,13 @@ elif st.session_state.page == "🗜️ Kompresi":
 elif st.session_state.page == "🔍 Deteksi":
     st.sidebar.markdown('<p class="sidebar-caption">🔍 Deteksi Kemiripan</p>', unsafe_allow_html=True)
 
-# ======================== PROFIL TIM DI SIDEBAR ========================
+# ======================== PROFIL TIM DI SIDEBAR (dengan kotak tegas) ========================
 st.sidebar.markdown("---")
 st.sidebar.markdown('<div class="sidebar-profile">', unsafe_allow_html=True)
 st.sidebar.markdown("### 👥 Pengembangan Aplikasi")
 st.sidebar.markdown("**Teknik Informatika**")
 
-# DATA ANGGOTA – dengan inisial seperti di gambar
+# DATA ANGGOTA
 anggota = [
     {
         "inisial": "GDA",
@@ -610,6 +623,15 @@ if page == "🏠 Home":
     </div>
     """, unsafe_allow_html=True)
 
+    # --- KETERANGAN TAMBAHAN DI BAWAH HOME ---
+    st.markdown("""
+    <div class="footer-note">
+        <p>📌 <b>Keterangan:</b> Halaman ini adalah pintu masuk utama. 
+        Gunakan menu di sidebar untuk mengakses fitur pengolahan gambar. 
+        Selamat berkarya! 🌸</p>
+    </div>
+    """, unsafe_allow_html=True)
+
 elif page == "🌫️ Grayscale":
     # ==================== GRAYSCALE ====================
     if not st.session_state.grayscale_visited:
@@ -702,6 +724,14 @@ elif page == "🌫️ Grayscale":
         draw.rectangle([50, 180, 150, 280], fill='#66BB6A')
         draw.rectangle([200, 180, 300, 280], fill='#FFA726')
         st.image(example_img, caption="Contoh gambar (unggah gambar Anda sendiri untuk hasil nyata)", use_container_width=True)
+
+    # --- KETERANGAN TAMBAHAN DI BAWAH GRAYSCALE ---
+    st.markdown("""
+    <div class="footer-note">
+        <p>📌 <b>Keterangan:</b> Fitur ini mengubah gambar berwarna menjadi hitam-putih (grayscale). 
+        Hasilnya dapat diunduh dalam format PNG. Cocok untuk efek klasik dan penghematan ukuran file.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 elif page == "🗜️ Kompresi":
     # ==================== KOMPRESI PCA ====================
@@ -796,6 +826,14 @@ elif page == "🗜️ Kompresi":
     else:
         st.info("👆 Unggah gambar untuk memulai kompresi.")
 
+    # --- KETERANGAN TAMBAHAN DI BAWAH KOMPRESI ---
+    st.markdown("""
+    <div class="footer-note">
+        <p>📌 <b>Keterangan:</b> Kompresi PCA mengurangi dimensi gambar dengan mempertahankan informasi paling penting. 
+        Geser slider untuk mengatur tingkat kompresi. Hasil dapat diunduh sebagai PNG.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
 elif page == "🔍 Deteksi":
     # ==================== DETEKSI KEMIRIPAN ====================
     if not st.session_state.deteksi_visited:
@@ -868,3 +906,11 @@ elif page == "🔍 Deteksi":
                 st.error(f"Terjadi kesalahan: {e}")
     else:
         st.info("👆 Unggah dua gambar untuk membandingkannya.")
+
+    # --- KETERANGAN TAMBAHAN DI BAWAH DETEKSI ---
+    st.markdown("""
+    <div class="footer-note">
+        <p>📌 <b>Keterangan:</b> Deteksi kemiripan menggunakan SSIM (Structural Similarity) dan MSE (Mean Squared Error). 
+        Semakin tinggi SSIM dan rendah MSE, semakin mirip kedua gambar.</p>
+    </div>
+    """, unsafe_allow_html=True)
