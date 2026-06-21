@@ -797,7 +797,7 @@ elif page == "🌫️ Grayscale":
     """, unsafe_allow_html=True)
 
 elif page == "🗜️ Kompresi":
-    # ==================== KOMPRESI PCA LENGKAP ====================
+    # ==================== KOMPRESI PCA WARNA (RGB) ====================
     if not st.session_state.kompresi_visited:
         st.balloons()
         st.session_state.kompresi_visited = True
@@ -805,8 +805,8 @@ elif page == "🗜️ Kompresi":
     st.markdown("""
     <div class="kompresi-header">
         <div class="cloud-shower">☁️ ☁️ ☁️ ☁️ ☁️ ☁️ ☁️ ☁️ ☁️ ☁️ ☁️ ☁️</div>
-        <h1>🗜️ Kompresi Gambar dengan PCA</h1>
-        <p>Kecilkan ukuran, pertahankan esensi.</p>
+        <h1>🗜️ Kompresi Gambar dengan PCA (RGB)</h1>
+        <p>Kecilkan ukuran, pertahankan esensi warna.</p>
         <div class="cloud-shower">☁️ ☁️ ☁️ ☁️ ☁️ ☁️ ☁️ ☁️ ☁️ ☁️ ☁️ ☁️</div>
     </div>
     """, unsafe_allow_html=True)
@@ -816,87 +816,98 @@ elif page == "🗜️ Kompresi":
                 padding: 1.5rem; border-radius: 16px; border: 1px solid #90CAF9; 
                 margin-bottom: 2rem; text-align: center;">
         <p style="font-size:1.2rem; color:#0D47A1;">
-            ☁️ <b>Principal Component Analysis (PCA)</b> adalah teknik cerdas yang mereduksi dimensi gambar 
-            tanpa menghilangkan jati dirinya. Seperti awan yang menampung jutaan tetes air, 
-            PCA merangkum informasi penting dalam bentuk yang lebih ringkas.
+            ☁️ <b>Principal Component Analysis (PCA)</b> diterapkan pada setiap kanal warna (R, G, B) secara terpisah. 
+            Dengan memilih jumlah komponen <b>k</b>, kita dapat mengontrol tingkat kompresi sambil mempertahankan warna asli.
         </p>
         <p style="color:#1565C0; font-style:italic;">
-            "Kecilkan ukuran, pertahankan esensi – itulah keajaiban kompresi."
+            "Warna adalah jiwa gambar – kompresi tanpa menghilangkan keindahannya."
         </p>
     </div>
     """, unsafe_allow_html=True)
 
     uploaded_file = st.file_uploader(
-        "📤 Unggah gambar untuk dikompresi",
+        "📤 Unggah gambar untuk dikompresi (JPG, PNG, WEBP)",
         type=["jpg", "jpeg", "png", "webp"],
         accept_multiple_files=False
     )
 
     if uploaded_file is not None:
-        # Baca gambar dan konversi ke grayscale
-        image = Image.open(uploaded_file).convert("L")  # Grayscale
+        # Baca gambar RGB
+        image = Image.open(uploaded_file).convert("RGB")
         img_array = np.array(image, dtype=np.float32)
-        h, w = img_array.shape
+        h, w, c = img_array.shape  # c = 3
 
         # Pilihan mode: berdasarkan jumlah komponen (k) atau persentase varians
         mode = st.radio(
             "Pilih mode pengaturan kompresi:",
             ["Jumlah komponen (k)", "Persentase varians"],
-            horizontal=True
+            horizontal=True,
+            key="kompresi_mode"
         )
 
+        max_k = min(h, w)  # batas maksimum k (tidak boleh lebih dari dimensi)
+
         if mode == "Jumlah komponen (k)":
-            max_k = min(h, w)
             k = st.slider(
-                "Jumlah komponen PCA (k)",
+                "Jumlah komponen PCA (k) – semakin kecil, semakin besar kompresi",
                 min_value=1,
                 max_value=max_k,
                 value=min(100, max_k),
                 step=1,
-                help="Semakin besar k, semakin mendekati gambar asli."
+                key="k_slider"
             )
+            variance_target = None
         else:  # Persentase varians
             variance_target = st.slider(
                 "Persentase varians yang dipertahankan (%)",
                 min_value=50,
                 max_value=100,
                 value=95,
-                step=1
+                step=1,
+                key="variance_slider"
             ) / 100.0
-            # nanti kita hitung k dari PCA fit
+            k = None
 
         if st.button("🚀 Kompresi dengan PCA", use_container_width=True):
             try:
-                # PCA pada matriks gambar (sampel = baris, fitur = kolom)
-                pca = PCA()
-                pca.fit(img_array)  # fit full PCA untuk dapat explained variance
-                
+                # Tentukan k jika mode persentase varians
                 if mode == "Persentase varians":
-                    # Cari jumlah komponen yang mencapai varians target
-                    cumsum = np.cumsum(pca.explained_variance_ratio_)
+                    # Fit PCA pada channel R untuk mendapatkan explained variance
+                    pca_full = PCA()
+                    pca_full.fit(img_array[:, :, 0])
+                    cumsum = np.cumsum(pca_full.explained_variance_ratio_)
                     k = np.searchsorted(cumsum, variance_target) + 1
-                    if k > min(h, w):
-                        k = min(h, w)
+                    if k > max_k:
+                        k = max_k
                     st.info(f"Untuk mempertahankan {variance_target*100:.0f}% varians, diperlukan k = {k} komponen.")
 
-                # Lakukan PCA dengan k komponen
-                pca = PCA(n_components=k)
-                reduced = pca.fit_transform(img_array)  # shape (h, k)
-                reconstructed = pca.inverse_transform(reduced)  # shape (h, w)
+                # Lakukan PCA pada setiap channel dengan k komponen
+                channels_recon = []
+                for i in range(3):
+                    channel = img_array[:, :, i]  # shape (h, w)
+                    pca = PCA(n_components=k)
+                    reduced = pca.fit_transform(channel)  # (h, k)
+                    recon = pca.inverse_transform(reduced)  # (h, w)
+                    channels_recon.append(recon)
 
-                # Normalisasi dan konversi ke uint8 untuk tampilan
+                # Gabungkan channel
+                reconstructed = np.stack(channels_recon, axis=2)  # (h, w, 3)
                 reconstructed = np.clip(reconstructed, 0, 255).astype(np.uint8)
-                img_reconstructed = Image.fromarray(reconstructed, mode='L')
+                img_reconstructed = Image.fromarray(reconstructed, mode='RGB')
 
-                # Hitung metrik kualitas
-                original_norm = img_array / 255.0
+                # Hitung metrik kualitas (multichannel)
+                img_norm = img_array / 255.0
                 recon_norm = reconstructed / 255.0
-                ssim_val = ssim(original_norm, recon_norm, data_range=1.0)
-                psnr_val = psnr(original_norm, recon_norm, data_range=1.0)
+                ssim_val = ssim(img_norm, recon_norm, multichannel=True, data_range=1.0, channel_axis=2)
+                # PSNR rata-rata per channel
+                psnr_vals = []
+                for i in range(3):
+                    psnr_vals.append(psnr(img_norm[:, :, i], recon_norm[:, :, i], data_range=1.0))
+                psnr_val = np.mean(psnr_vals)
 
-                # Ukuran dan penghematan
-                ukuran_asli = h * w
-                ukuran_baru = h * k + k * w  # perkiraan koefisien
+                # Ukuran dan penghematan (perkiraan)
+                ukuran_asli = h * w * 3
+                ukuran_baru = (h * k + k * w) * 3  # koefisien + komponen untuk 3 channel
                 rasio = ukuran_baru / ukuran_asli
                 penghematan = (1 - rasio) * 100
 
@@ -904,7 +915,7 @@ elif page == "🗜️ Kompresi":
                 col1, col2 = st.columns(2)
                 with col1:
                     st.markdown('<div class="image-card">', unsafe_allow_html=True)
-                    st.markdown("### 🖼️ Gambar Asli (Grayscale)")
+                    st.markdown("### 🖼️ Gambar Asli (RGB)")
                     st.image(image, use_container_width=True)
                     st.markdown(f"*Ukuran: {w} x {h} px*")
                     st.markdown('</div>', unsafe_allow_html=True)
@@ -939,24 +950,27 @@ elif page == "🗜️ Kompresi":
                 st.markdown(f"""
                 <div class="detail-comp">
                     <ul>
-                        <li><b>Ukuran asli:</b> {ukuran_asli} pixel</li>
+                        <li><b>Ukuran asli:</b> {ukuran_asli} pixel (3 channel)</li>
                         <li><b>Ukuran setelah PCA (approx):</b> {ukuran_baru} koefisien</li>
                         <li><b>Rasio kompresi:</b> {rasio:.4f}</li>
-                        <li><b>Jumlah komponen PCA:</b> {k}</li>
+                        <li><b>Jumlah komponen PCA (per channel):</b> {k}</li>
                     </ul>
                 </div>
                 """, unsafe_allow_html=True)
 
-                # --- Kurva Akumulasi Informasi PCA ---
-                st.markdown("### 📈 Kurva Akumulasi Informasi PCA")
+                # --- Kurva Akumulasi Informasi PCA (channel R) ---
+                st.markdown("### 📈 Kurva Akumulasi Informasi PCA (Channel R)")
+                # Fit PCA full pada channel R untuk kurva
+                pca_full = PCA()
+                pca_full.fit(img_array[:, :, 0])
+                cumsum_var = np.cumsum(pca_full.explained_variance_ratio_)
                 fig, ax = plt.subplots(figsize=(8, 5))
-                cumsum_var = np.cumsum(pca.explained_variance_ratio_)
                 ax.plot(range(1, len(cumsum_var)+1), cumsum_var, 'b-', linewidth=2)
                 ax.axhline(y=1.0, color='r', linestyle='--', alpha=0.3)
-                ax.axvline(x=k, color='g', linestyle='--', alpha=0.5, label=f'k={k}')
+                ax.axvline(x=k, color='g', linestyle='--', alpha=0.5, label=f'k = {k}')
                 ax.set_xlabel('Jumlah Komponen')
                 ax.set_ylabel('Akumulasi Varians')
-                ax.set_title('Kurva Akumulasi Informasi PCA')
+                ax.set_title('Kurva Akumulasi Informasi PCA (Channel Red)')
                 ax.grid(True, alpha=0.3)
                 ax.legend()
                 st.pyplot(fig)
@@ -973,7 +987,7 @@ elif page == "🗜️ Kompresi":
     # --- KETERANGAN TAMBAHAN DI BAWAH KOMPRESI ---
     st.markdown("""
     <div class="footer-note">
-        <p>📌 <b>Keterangan:</b> Kompresi PCA mereduksi dimensi gambar (baris) dengan mempertahankan komponen utama. 
+        <p>📌 <b>Keterangan:</b> Kompresi PCA diterapkan pada setiap kanal warna (R, G, B) secara terpisah. 
         Atur jumlah komponen (k) atau persentase varians yang diinginkan. Metrik kualitas (SSIM, PSNR) dan kurva akumulasi membantu mengevaluasi hasil.</p>
     </div>
     """, unsafe_allow_html=True)
