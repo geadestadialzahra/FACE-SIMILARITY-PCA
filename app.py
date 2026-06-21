@@ -489,7 +489,6 @@ for col, (emoji, page_name, label) in zip(cols, menus):
                 st.session_state.kompresi_visited = False
             elif page_name == "🔍 Deteksi":
                 st.session_state.deteksi_visited = False
-            st.rerun()
 
             st.sidebar.markdown("""
 <div style="text-align: center; font-size: 14px; color: #880E4F; padding: 0 5px 8px 5px; font-style: italic;">
@@ -497,6 +496,7 @@ for col, (emoji, page_name, label) in zip(cols, menus):
 </div>
 """, unsafe_allow_html=True)
 
+ st.rerun()
 # --- CAPTION DI BAWAH TOMBOL ---
 st.sidebar.markdown("---")
 if st.session_state.page == "🏠 Home":
